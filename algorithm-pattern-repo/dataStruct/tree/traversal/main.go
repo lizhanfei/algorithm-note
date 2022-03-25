@@ -6,11 +6,6 @@ import (
 	"fmt"
 )
 
-func main() {
-	//preorderTraversal(&treeTraversal.Node5)
-	preorderTraversalV2(&treeTraversal.Node5)
-}
-
 //preorderTraversal 前序递归遍历。中->左->右
 //时间复杂度 O(N) 要遍历所有的节点
 func preorderTraversal(root *treeTraversal.Node) {
