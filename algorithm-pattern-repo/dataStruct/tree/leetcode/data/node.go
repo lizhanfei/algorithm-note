@@ -37,3 +37,22 @@ func InitRecoverTree() {
 	Node2.Right = &Node1
 }
 
+
+func InitIsSymmetric() {
+	Node1.Val = 9
+	Node2.Val = -42
+	Node3.Val = -42
+	Node4.Val = 76
+	Node5.Val = 76
+	Node6.Val = 13
+	Node7.Val = 13
+
+
+	Node1.Left = &Node2
+	Node1.Right = &Node3
+	Node2.Left = &Node4
+	Node3.Right = &Node5
+	Node4.Right = &Node6
+	Node5.Left = &Node7
+}
+
