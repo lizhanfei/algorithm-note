@@ -70,6 +70,6 @@ func TestMaxDepthV2(t *testing.T) {
 func BenchmarkMaxDepthV2(b *testing.B) {
 	data.InitIsSymmetric()
 	for n := 0; n < b.N; n++ {
-		fmt.Println(maxDepthV2(&data.Node1))
+		maxDepthV2(&data.Node1)
 	}
 }
