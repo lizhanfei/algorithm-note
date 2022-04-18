@@ -58,7 +58,7 @@ func isSymmetric(root *data.TreeNode) bool {
 }
 
 func isSymmetricLevel(left *data.TreeNode, right *data.TreeNode) bool {
-	if nil == left && nil == right{//左右有一个等于nil，则返回true
+	if nil == left && nil == right { //左右有一个等于nil，则返回true
 		return true
 	}
 	if (nil == left && nil != right) || (nil != left && nil == right) { //只有一个等于nil，则返回false
@@ -89,7 +89,7 @@ func isSymmetricV2(root *data.TreeNode) bool {
 		queue = queue[1:]
 
 		//对比 nodeNow 元素
-		if nil == nodeNow[0] && nil == nodeNow[1]{//左右有一个等于nil，则返回true
+		if nil == nodeNow[0] && nil == nodeNow[1] { //左右有一个等于nil，则返回true
 			return true
 		}
 		if (nil == nodeNow[0] && nil != nodeNow[1]) || (nil != nodeNow[0] && nil == nodeNow[1]) { //只有一个等于nil，则返回false
@@ -98,9 +98,88 @@ func isSymmetricV2(root *data.TreeNode) bool {
 		if nodeNow[0].Val != nodeNow[1].Val {
 			return false
 		}
-		queue =append(queue, [2]*data.TreeNode{nodeNow[0].Left, nodeNow[1].Right})
-		queue =append(queue, [2]*data.TreeNode{nodeNow[0].Right, nodeNow[1].Left})
+		queue = append(queue, [2]*data.TreeNode{nodeNow[0].Left, nodeNow[1].Right})
+		queue = append(queue, [2]*data.TreeNode{nodeNow[0].Right, nodeNow[1].Left})
 	}
 
 	return true
+}
+
+//maxDepth  二叉树的最大深度
+//leetcode: https://leetcode-cn.com/problems/maximum-depth-of-binary-tree/
+//思路： 递归解决
+//每递归一层，深度增加一
+//时间复杂度 O(N) 需要遍历所有的节点
+// 空间复杂度
+func maxDepth(root *data.TreeNode) int {
+	if nil == root {
+		return 0
+	}
+	deepNow := 1
+	var maxDeep = 1
+	recursionDepthTree(root, deepNow, &maxDeep)
+	return maxDeep
+}
+
+func recursionDepthTree(nodeNow *data.TreeNode, deepNow int, maxDeep *int) {
+	if deepNow > *maxDeep {
+		*maxDeep = deepNow
+	}
+	if nil != nodeNow.Left {
+		deepNowLeft := deepNow + 1
+		recursionDepthTree(nodeNow.Left, deepNowLeft, maxDeep)
+	}
+	if nil != nodeNow.Right {
+		deepNowRight := deepNow + 1
+		recursionDepthTree(nodeNow.Right, deepNowRight, maxDeep)
+	}
+}
+
+//maxDepthV2 二叉树的最大深度
+//leetcode: https://leetcode-cn.com/problems/maximum-depth-of-binary-tree/
+// 思路： 迭代
+// 套用深度优先搜索的模式
+// 遍历的节点在入栈时，保存一个二维数组，一个保存节点，一个保存深度
+// 每次入栈时，使用当前节点的深度+1，保存新节点的深度。
+// 同时获取最大的深度
+type NodeWithDeep struct {
+	deep int
+	node *data.TreeNode
+}
+
+func maxDepthV2(root *data.TreeNode) int {
+	if nil == root {
+		return 0
+	}
+	var maxDeep = 1
+	var stack = make([]*NodeWithDeep, 0)//基于队列实现栈
+	stack = append(stack, &NodeWithDeep{
+		deep: 1,
+		node: root,
+	})
+
+	var nodeNow *NodeWithDeep
+	for {
+		if 0 == len(stack) {
+			break
+		}
+		nodeNow = stack[len(stack)-1]
+		stack = stack[:len(stack)-1]
+		if nodeNow.deep > maxDeep {
+			maxDeep = nodeNow.deep
+		}
+		if nodeNow.node.Left != nil {
+			stack = append(stack, &NodeWithDeep{
+				deep: nodeNow.deep + 1,
+				node: nodeNow.node.Left,
+			})
+		}
+		if nodeNow.node.Right != nil {
+			stack = append(stack, &NodeWithDeep{
+				deep: nodeNow.deep + 1,
+				node: nodeNow.node.Right,
+			})
+		}
+	}
+	return maxDeep
 }

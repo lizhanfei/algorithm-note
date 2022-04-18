@@ -40,7 +40,6 @@ func BenchmarkIsSymmetric(b *testing.B) {
 	}
 }
 
-
 func BenchmarkIsSymmetricV2(b *testing.B) {
 	data.InitIsSymmetric()
 
@@ -51,5 +50,26 @@ func BenchmarkIsSymmetricV2(b *testing.B) {
 		//} else {
 		//	fmt.Println("false")
 		//}
+	}
+}
+
+func TestMaxDepth(t *testing.T) {
+	data.InitIsSymmetric()
+
+	fmt.Println(maxDepth(&data.Node1))
+}
+
+
+func TestMaxDepthV2(t *testing.T) {
+	data.InitIsSymmetric()
+
+	fmt.Println(maxDepthV2(&data.Node1))
+}
+
+
+func BenchmarkMaxDepthV2(b *testing.B) {
+	data.InitIsSymmetric()
+	for n := 0; n < b.N; n++ {
+		fmt.Println(maxDepthV2(&data.Node1))
 	}
 }
