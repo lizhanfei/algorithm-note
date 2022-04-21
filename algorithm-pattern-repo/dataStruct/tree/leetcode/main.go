@@ -2,6 +2,7 @@ package leetcode
 
 import (
 	"algorithm-pattern-repo/dataStruct/tree/leetcode/data"
+	"math"
 )
 
 //recoverTree 恢复二叉树
@@ -152,7 +153,7 @@ func maxDepthV2(root *data.TreeNode) int {
 		return 0
 	}
 	var maxDeep = 1
-	var stack = make([]*NodeWithDeep, 0)//基于队列实现栈
+	var stack = make([]*NodeWithDeep, 0) //基于队列实现栈
 	stack = append(stack, &NodeWithDeep{
 		deep: 1,
 		node: root,
@@ -183,3 +184,94 @@ func maxDepthV2(root *data.TreeNode) int {
 	}
 	return maxDeep
 }
+
+//sortedListToBST 有序链表转换二叉搜索树
+//leetcode: https://leetcode-cn.com/problems/convert-sorted-list-to-binary-search-tree/
+//思路： 寻找链表的中位节点作为根节点，将尾节点作为跟节点的右节点
+//递归从头结点到 中位节点，建立左子树
+//从中位节点到尾节点，建立右子树
+type queueTask struct {
+	parent     *data.TreeNode
+	parentType int // 1->left 2->right
+	left       int //左边界
+	right      int //右边界
+}
+
+func sortedListToBST(head *data.ListNode) *data.TreeNode {
+	if head == nil {
+		return nil
+	}
+	//借助一个切片，存储链表的每一个节点
+	listNodeArr := make([]*data.ListNode, 0)
+	for {
+		if head == nil {
+			break
+		}
+		listNodeArr = append(listNodeArr, head)
+		head = head.Next
+	}
+	//迭代。创建一个切片。每次取节点的中位节点作为根节点
+	queue := make([]*queueTask, 0)
+	//取queue的中位节点作为根节点
+	middle := len(listNodeArr) / 2
+	root := &data.TreeNode{
+		Val: listNodeArr[middle].Val,
+	}
+	queue = append(queue, &queueTask{
+		parent:     root,
+		parentType: 1,
+		left:       0,
+		right:      middle - 1,
+	})
+	queue = append(queue, &queueTask{
+		parent:     root,
+		parentType: 2,
+		left:       middle + 1,
+		right:      len(listNodeArr) - 1,
+	})
+	for {
+		//退出条件。
+		if 0 == len(queue) {
+			break
+		}
+		nodeTmp := queue[0]
+		queue = queue[1:]
+		//根据 nodeTmp 构造节点
+		if nodeTmp.left > nodeTmp.right {
+			continue
+		}
+		middle := int(math.Ceil(float64(nodeTmp.right-nodeTmp.left)/2.0)) + nodeTmp.left
+		//当前节点只有一个
+		tmp := data.TreeNode{
+			Val: listNodeArr[middle].Val,
+		}
+		switch nodeTmp.parentType {
+		case 1:
+			nodeTmp.parent.Left = &tmp
+		case 2:
+			nodeTmp.parent.Right = &tmp
+		}
+		queue = append(queue, &queueTask{
+			parent:     &tmp,
+			parentType: 1,
+			left:       nodeTmp.left,
+			right:      middle - 1,
+		})
+		queue = append(queue, &queueTask{
+			parent:     &tmp,
+			parentType: 2,
+			left:       middle + 1,
+			right:      nodeTmp.right,
+		})
+	}
+
+	return root
+}
+
+
+//sortedListToBSTV2
+func sortedListToBSTV2(head *data.ListNode) *data.TreeNode {
+
+}
+
+

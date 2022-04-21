@@ -3,6 +3,7 @@ package leetcode
 import (
 	"algorithm-pattern-repo/dataStruct/tree/leetcode/data"
 	"fmt"
+	"math"
 	"testing"
 )
 
@@ -72,4 +73,17 @@ func BenchmarkMaxDepthV2(b *testing.B) {
 	for n := 0; n < b.N; n++ {
 		maxDepthV2(&data.Node1)
 	}
+}
+
+
+func TestSortedListToBST(t *testing.T) {
+	data.InitSortedList()
+
+	res := sortedListToBST(&data.ListNode1)
+	fmt.Println(res)
+}
+
+func TestSortedListToBSTV1(t *testing.T) {
+	fmt.Println(int(math.Ceil(1.0 / 2.0)))
+	//fmt.Println(sortedListToBST(&data.ListNode1))
 }
