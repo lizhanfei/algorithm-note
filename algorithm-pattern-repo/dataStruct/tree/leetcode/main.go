@@ -2,6 +2,7 @@ package leetcode
 
 import (
 	"algorithm-pattern-repo/dataStruct/tree/leetcode/data"
+	"fmt"
 	"math"
 )
 
@@ -268,10 +269,223 @@ func sortedListToBST(head *data.ListNode) *data.TreeNode {
 	return root
 }
 
+//largestValues 二叉树每层的最大值
+//leetcode: https://leetcode-cn.com/problems/hPov7L/
+//思路：
+// 参考二叉树层序遍历 https://leetcode-cn.com/problems/binary-tree-level-order-traversal/
+//每一层遍历时，记录下最大值
+func largestValues(root *data.TreeNode) []int {
+	maxRes := make([]int, 0)
+	if nil == root {
+		return maxRes
+	}
+	queueNow := make([]*data.TreeNode, 0)
+	queueNow = append(make([]*data.TreeNode, 0), root)
 
-//sortedListToBSTV2
-func sortedListToBSTV2(head *data.ListNode) *data.TreeNode {
-
+	queueTmp := make([]*data.TreeNode, 0)
+	for {
+		if 0 == len(queueNow) {
+			break
+		}
+		maxValue := math.MinInt32
+		for {
+			if 0 == len(queueNow) {
+				break
+			}
+			root = queueNow[0]
+			queueNow = queueNow[1:]
+			if root.Left != nil {
+				queueTmp = append(queueTmp, root.Left)
+			}
+			if root.Right != nil {
+				queueTmp = append(queueTmp, root.Right)
+			}
+			if root.Val > maxValue {
+				maxValue = root.Val
+			}
+		}
+		queueNow = append(queueNow, queueTmp...)
+		queueTmp = queueTmp[:0]
+		maxRes = append(maxRes, maxValue)
+	}
+	return maxRes
 }
 
+//findBottomLeftValue  二叉树最底层最左边的值
+//leetcode: https://leetcode-cn.com/problems/LwUNpT/
+//思路：
+//深度优先遍历
+//遍历中记录当前深度和节点值
+//遍历到叶子节点时，判断深度是否大于已知深度，大于已知深度，则将当前叶子节点的值设为结果
+type nodeWithDeep struct {
+	node *data.TreeNode
+	deep int
+}
 
+func findBottomLeftValue(root *data.TreeNode) int {
+	res := 0
+	maxDeep := math.MinInt32
+
+	stack := make([]*nodeWithDeep, 0)
+	stack = append(stack, &nodeWithDeep{
+		node: root,
+		deep: 1,
+	})
+
+	for 0 != len(stack) {
+		nodeNow := stack[len(stack)-1]
+		stack = stack[:len(stack)-1]
+
+		if nodeNow.node.Left != nil || nodeNow.node.Right != nil { //非叶子节点
+			if nodeNow.node.Right != nil {
+				stack = append(stack, &nodeWithDeep{
+					node: nodeNow.node.Right,
+					deep: nodeNow.deep + 1,
+				})
+			}
+			if nodeNow.node.Left != nil {
+				stack = append(stack, &nodeWithDeep{
+					node: nodeNow.node.Left,
+					deep: nodeNow.deep + 1,
+				})
+			}
+		} else {                        //叶子节点
+			if nodeNow.deep > maxDeep { //超过当前最大深度
+				res = nodeNow.node.Val
+				maxDeep = nodeNow.deep
+			}
+		}
+	}
+
+	return res
+}
+
+//rightSideView 二叉树的右侧视图
+//leetcode: https://leetcode-cn.com/problems/WNC0Lk/
+//思路：
+//层序遍历，每层从右向左遍历
+//每层取第一个压入结果集
+func rightSideView(root *data.TreeNode) []int {
+	res := make([]int, 0)
+	if nil == root {
+		return res
+	}
+
+	queueNow := make([]*data.TreeNode, 0)
+	queueNow = append(queueNow, root)
+
+	queueTmp := make([]*data.TreeNode, 0)
+	var resTmp int
+	for {
+		if 0 == len(queueNow) {
+			break
+		}
+		resTmp = -200
+		for {
+			if 0 == len(queueNow) {
+				break
+			}
+			root = queueNow[0]
+			queueNow = queueNow[1:]
+			if resTmp == -200 {
+				resTmp = root.Val
+			}
+			if root.Right != nil {
+				queueTmp = append(queueTmp, root.Right)
+			}
+			if root.Left != nil {
+				queueTmp = append(queueTmp, root.Left)
+			}
+		}
+		queueNow = append(queueNow, queueTmp...)
+		queueTmp = queueTmp[:0]
+		res = append(res, resTmp)
+	}
+	return res
+}
+
+//pruneTree 二叉树剪枝
+//leetcode https://leetcode-cn.com/problems/pOCWxh/
+// 思路：
+//计算每个节点子树的节点和
+//如果某个节点的左右子节点不全为0，那么把为0的节点减掉
+//如果左右节点均为0.当前节点不为0，那么把左右节点均减掉;否则，不处理
+//
+func pruneTree(root *data.TreeNode) *data.TreeNode {
+	if 0 == handleTreeNode(root) {
+		root = nil
+	}
+	return root
+}
+
+//handleTreeNode 处理子树，并返回从root往下所有节点的和
+func handleTreeNode(root *data.TreeNode) int {
+	var leftVal, rightVal int
+	if nil != root.Left {
+		leftVal = handleTreeNode(root.Left)
+	}
+	if nil != root.Right {
+		rightVal = handleTreeNode(root.Right)
+	}
+	if leftVal != 0 || rightVal != 0 { //子树不全为0，那么剪除为0 的子树
+		if leftVal == 0 {
+			root.Left = nil
+		}
+		if rightVal == 0 {
+			root.Right = nil
+		}
+
+	} else if root.Val != 0 {
+		root.Left = nil
+		root.Right = nil
+	}
+
+	return root.Val + leftVal + rightVal
+}
+
+type NodeWithValNow struct {
+	node   *data.TreeNode
+	valNow int //当前的值
+}
+
+func sumNumbers(root *data.TreeNode) int {
+	if nil == root {
+		return 0
+	}
+	res := make([]int, 0)
+	var stack = make([]*NodeWithValNow, 0) //基于队列实现栈
+	stack = append(stack, &NodeWithValNow{
+		valNow: root.Val,
+		node:   root,
+	})
+
+	var nodeNow *NodeWithValNow
+	for {
+		if 0 == len(stack) {
+			break
+		}
+		nodeNow = stack[len(stack)-1]
+		stack = stack[:len(stack)-1]
+		if nodeNow.node.Left != nil {
+			stack = append(stack, &NodeWithValNow{
+				valNow: nodeNow.valNow*10 + nodeNow.node.Left.Val,
+				node:   nodeNow.node.Left,
+			})
+		}
+		if nodeNow.node.Right != nil {
+			stack = append(stack, &NodeWithValNow{
+				valNow: nodeNow.valNow*10 + nodeNow.node.Right.Val,
+				node:   nodeNow.node.Right,
+			})
+		}
+		if nil == nodeNow.node.Left && nil == nodeNow.node.Right { //叶子节点
+			res = append(res, nodeNow.valNow)
+		}
+	}
+	fmt.Println(res)
+	resReturn := 0
+	for _, v := range res {
+		resReturn += v
+	}
+	return resReturn
+}

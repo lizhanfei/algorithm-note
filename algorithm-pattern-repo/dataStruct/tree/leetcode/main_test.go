@@ -87,3 +87,14 @@ func TestSortedListToBSTV1(t *testing.T) {
 	fmt.Println(int(math.Ceil(1.0 / 2.0)))
 	//fmt.Println(sortedListToBST(&data.ListNode1))
 }
+
+func TestRightSideView(t *testing.T) {
+	data.InitRightSideView()
+
+	fmt.Println(rightSideView(&data.Node1))
+}
+
+func TestSumNumbers(t *testing.T) {
+	data.InitSumNumbers()
+	fmt.Println(sumNumbers(&data.Node1))
+}

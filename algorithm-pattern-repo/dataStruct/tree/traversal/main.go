@@ -2,6 +2,7 @@ package main
 
 import (
 	baseStack "algorithm-pattern-repo/dataStruct/stack/base"
+	"algorithm-pattern-repo/dataStruct/tree/leetcode/data"
 	"algorithm-pattern-repo/dataStruct/tree/traversal/treeTraversal"
 	"fmt"
 )
@@ -333,4 +334,78 @@ func levelOrderBottomV2(root *treeTraversal.Node) [][]int {
 	}
 
 	return res
+}
+
+//increasingBST 二叉树展开
+//leetcode: https://leetcode-cn.com/problems/NYBBNL/
+//思路：
+//中序遍历
+func increasingBST(root *data.TreeNode) *data.TreeNode {
+	var resNode *data.TreeNode
+	if root == nil {
+		return resNode
+	}
+	var nodeNow *data.TreeNode
+	//
+	var scan func(root *data.TreeNode)
+	scan = func(root *data.TreeNode) {
+		if nil == root {
+			return
+		}
+		scan(root.Left)
+		if resNode == nil {
+			//第一个节点
+			nodeNow = &data.TreeNode{
+				Val:   root.Val,
+				Left:  nil,
+				Right: nil,
+			}
+			resNode = nodeNow
+		} else {
+			tmp := &data.TreeNode{
+				Val:   root.Val,
+				Left:  nil,
+				Right: nil,
+			}
+			nodeNow.Right = tmp
+			nodeNow = tmp
+		}
+		scan(root.Right)
+	}
+	scan(root)
+	return resNode
+}
+
+//inorderSuccessor 二叉搜索树中的中序后继
+// leetcode : https://leetcode-cn.com/problems/P5rCT8/
+//思路：
+//中序遍历，找到p值，返回后面的值
+func inorderSuccessor(root *data.TreeNode, p *data.TreeNode) *data.TreeNode {
+	if root == nil  || p == nil {
+		return nil
+	}
+
+	var scan func(root *data.TreeNode)
+	var needNext bool
+	var next *data.TreeNode
+	scan = func(root *data.TreeNode) {
+		if nil == root {
+			return
+		}
+		if next != nil {
+			return
+		}
+
+		scan(root.Left)
+		if needNext == true && next == nil {
+			next = root
+			return
+		}
+		if root == p {
+			needNext = true
+		}
+		scan(root.Right)
+	}
+	scan(root)
+	return next
 }
