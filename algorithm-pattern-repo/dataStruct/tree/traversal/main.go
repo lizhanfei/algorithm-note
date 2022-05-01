@@ -409,3 +409,98 @@ func inorderSuccessor(root *data.TreeNode, p *data.TreeNode) *data.TreeNode {
 	scan(root)
 	return next
 }
+
+//convertBST 所有大于等于节点的值之和
+// leetcode: https://leetcode-cn.com/problems/w6cpku/
+//思路：
+// 中序遍历
+// 获取 当前节点之后的所有节点的值的和
+func convertBST(root *data.TreeNode) *data.TreeNode {
+	if nil == root {
+		return nil
+	}
+	var scan func(root *data.TreeNode) int
+	var changeRes func(root *data.TreeNode, rightSum int)
+	scan = func(root *data.TreeNode) int {
+		if nil == root {
+			return 0
+		}
+		log := fmt.Sprintf("nodeNow:%d", root.Val)
+		var res int
+		scan(root.Left)
+		res += root.Val
+		res += scan(root.Right)
+		root.Val = res
+
+		//向左子树赋值
+		changeRes(root.Left, root.Val)
+
+		log += fmt.Sprintf("rightTmp: %d", res)
+		fmt.Println(log )
+		return res
+	}
+	//向右子树赋值
+	changeRes = func(root *data.TreeNode, rightSum int) {
+		if root == nil {
+			return
+		}
+		root.Val += rightSum
+		changeRes(root.Left, rightSum)
+		changeRes(root.Right, rightSum)
+	}
+
+	scan(root)
+	return root
+}
+
+//findTarget 二叉搜索树中两个节点之和
+// leetcode: https://leetcode-cn.com/problems/opLdQZ/
+// 思路：
+// bst 二叉树
+// 每个节点，再去获取遍历树，看是否有值相加和未目标值
+func findTarget(root *data.TreeNode, k int) bool {
+	if root == nil {
+		return false
+	}
+	var scan  func(root *data.TreeNode,  targetNum int, nodeNowStep *data.TreeNode) bool
+	scan = func(root *data.TreeNode, targetNum int, nodeNowStep *data.TreeNode) bool {//寻找值为targetNum的节点 排除 nodeNow 节点
+		//层序遍历
+		queueNow := make([]*data.TreeNode, 0)
+		queueNow = append(queueNow, root)
+		for 0 != len(queueNow) {
+			nodeNow := queueNow[0]
+			queueNow = queueNow[1:]
+
+			if nodeNow != nodeNowStep && nodeNow.Val == targetNum {
+				return true
+			}
+			if nodeNow.Left != nil {
+				queueNow = append(queueNow, nodeNow.Left)
+			}
+			if nodeNow.Right != nil {
+				queueNow = append(queueNow, nodeNow.Right)
+			}
+		}
+		return false
+	}
+
+
+	queueNow := make([]*data.TreeNode, 0)
+	queueNow = append(queueNow, root)
+
+	for 0 != len(queueNow) {
+		nodeNow := queueNow[0]
+		queueNow = queueNow[1:]
+
+		if scan(root, k - nodeNow.Val, nodeNow) {
+			return true
+		}
+		if nodeNow.Left != nil {
+			queueNow = append(queueNow, nodeNow.Left)
+		}
+		if nodeNow.Right != nil {
+			queueNow = append(queueNow, nodeNow.Right)
+		}
+	}
+	return false
+}
